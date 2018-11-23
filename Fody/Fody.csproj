@@ -21,12 +21,19 @@
     </Compile>
     <ProjectReference Include="..\FodyCommon\FodyCommon.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\FodyHelpers\FodyHelpers.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\FodyIsolated\FodyIsolated.csproj" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <Reference Include="Mono.Cecil" HintPath="..\Lib\Cecil\netstandard1.3\Mono.Cecil.dll" />
+    <Reference Include="Mono.Cecil.Mdb" HintPath="..\Lib\Cecil\netstandard1.3\Mono.Cecil.Mdb.dll" />
+    <Reference Include="Mono.Cecil.Pdb" HintPath="..\Lib\Cecil\netstandard1.3\Mono.Cecil.Pdb.dll" />
+    <Reference Include="Mono.Cecil.Rocks" HintPath="..\Lib\Cecil\netstandard1.3\Mono.Cecil.Rocks.dll" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.8.166" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'net46'">
+    <Reference Include="Mono.Cecil" HintPath="..\Lib\Cecil\net40\Mono.Cecil.dll" />
+    <Reference Include="Mono.Cecil.Mdb" HintPath="..\Lib\Cecil\net40\Mono.Cecil.Mdb.dll" />
+    <Reference Include="Mono.Cecil.Pdb" HintPath="..\Lib\Cecil\net40\Mono.Cecil.Pdb.dll" />
+    <Reference Include="Mono.Cecil.Rocks" HintPath="..\Lib\Cecil\net40\Mono.Cecil.Rocks.dll" />
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
