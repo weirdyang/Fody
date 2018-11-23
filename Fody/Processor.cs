@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 
 public partial class Processor
@@ -21,11 +20,9 @@ public partial class Processor
     public List<string> ReferenceCopyLocalPaths;
     public List<string> DefineConstants;
     public List<string> ConfigFiles;
-    IInnerWeaver innerWeaver;
+    InnerWeaver innerWeaver;
 
     AddinFinder addinFinder;
-    static Dictionary<string, IsolatedAssemblyLoadContext> solutionAssemblyLoadContexts =
-        new Dictionary<string, IsolatedAssemblyLoadContext>(StringComparer.OrdinalIgnoreCase);
 
     public BuildLogger Logger;
     static object locker;
@@ -125,48 +122,28 @@ see https://github.com/Fody/Fody/wiki/SampleUsage");
 
     void ExecuteInOwnAssemblyLoadContext()
     {
-        if (solutionAssemblyLoadContexts.TryGetValue(SolutionDirectory, out var loadContext))
+        innerWeaver = new InnerWeaver
         {
-            if (WeaversHistory.HasChanged(Weavers.Select(x => x.AssemblyPath)))
-            {
-                Logger.LogDebug("A Weaver HasChanged so loading a new AssemblyLoadContext");
-                loadContext.Unload();
-                loadContext = solutionAssemblyLoadContexts[SolutionDirectory] = CreateAssemblyLoadContext();
-            }
-        }
-        else
-        {
-            loadContext = solutionAssemblyLoadContexts[SolutionDirectory] = CreateAssemblyLoadContext();
-        }
+            AssemblyFilePath = AssemblyFilePath,
+            References = References,
+            KeyFilePath = KeyFilePath,
+            ReferenceCopyLocalPaths = ReferenceCopyLocalPaths,
+            SignAssembly = SignAssembly,
+            Logger = Logger,
+            SolutionDirectoryPath = SolutionDirectory,
+            Weavers = Weavers,
+            IntermediateDirectoryPath = IntermediateDirectory,
+            DefineConstants = DefineConstants,
+            ProjectDirectoryPath = ProjectDirectory,
+            DocumentationFilePath = DocumentationFilePath,
+            DebugSymbols = DebugSymbols
+        };
 
-        var assemblyFile = Path.Combine(AssemblyLocation.CurrentDirectory, "FodyIsolated.dll");
-        using (innerWeaver = (IInnerWeaver)loadContext.CreateInstanceFromAndUnwrap(assemblyFile, "InnerWeaver"))
-        {
-            innerWeaver.AssemblyFilePath = AssemblyFilePath;
-            innerWeaver.References = References;
-            innerWeaver.KeyFilePath = KeyFilePath;
-            innerWeaver.ReferenceCopyLocalPaths = ReferenceCopyLocalPaths;
-            innerWeaver.SignAssembly = SignAssembly;
-            innerWeaver.Logger = Logger;
-            innerWeaver.SolutionDirectoryPath = SolutionDirectory;
-            innerWeaver.Weavers = Weavers;
-            innerWeaver.IntermediateDirectoryPath = IntermediateDirectory;
-            innerWeaver.DefineConstants = DefineConstants;
-            innerWeaver.ProjectDirectoryPath = ProjectDirectory;
-            innerWeaver.DocumentationFilePath = DocumentationFilePath;
-            innerWeaver.DebugSymbols = DebugSymbols;
+        innerWeaver.Execute();
 
-            innerWeaver.Execute();
+        ReferenceCopyLocalPaths = innerWeaver.ReferenceCopyLocalPaths;
 
-            ReferenceCopyLocalPaths = innerWeaver.ReferenceCopyLocalPaths;
-        }
         innerWeaver = null;
-    }
-
-    IsolatedAssemblyLoadContext CreateAssemblyLoadContext()
-    {
-        Logger.LogDebug("Creating a new AssemblyLoadContext");
-        return new IsolatedAssemblyLoadContext($"Fody Domain for '{SolutionDirectory}'", AssemblyLocation.CurrentDirectory);
     }
 
     public void Cancel()

@@ -16,7 +16,7 @@ using FieldAttributes = Mono.Cecil.FieldAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
 #pragma warning disable 618
 
-public partial class InnerWeaver : MarshalByRefObject, IInnerWeaver
+public partial class InnerWeaver
 {
     public string ProjectDirectoryPath { get; set; }
     public string DocumentationFilePath { get; set; }
@@ -211,8 +211,8 @@ public partial class InnerWeaver : MarshalByRefObject, IInnerWeaver
                              TypeAttributes.Class;
         var typeDefinition = new TypeDefinition(null, "ProcessedByFody", typeAttributes, TypeSystem.ObjectReference);
         ModuleDefinition.Types.Add(typeDefinition);
-
-        AddVersionField(typeof(IInnerWeaver).Assembly, "FodyVersion", typeDefinition);
+        //TODO: cache version number
+        AddVersionField(typeof(InnerWeaver).Assembly, "FodyVersion", typeDefinition);
 
         foreach (var weaver in weaverInstances)
         {
@@ -280,21 +280,5 @@ public partial class InnerWeaver : MarshalByRefObject, IInnerWeaver
         {
             disposable.Dispose();
         }
-    }
-
-    public sealed override object InitializeLifetimeService()
-    {
-        // Returning null designates an infinite non-expiring lease.
-        // We must therefore ensure that RemotingServices.Disconnect() is called when
-        // it's no longer needed otherwise there will be a memory leak.
-        return null;
-    }
-
-    public void Dispose()
-    {
-#if NET46
-        //Disconnects the remoting channel(s) of this object and all nested objects.
-        RemotingServices.Disconnect(this);
-#endif
     }
 }

@@ -19,7 +19,6 @@
     <Compile Include="..\NugetConfigReader.cs">
       <Link>NugetConfigReader.cs</Link>
     </Compile>
-    <ProjectReference Include="..\FodyCommon\FodyCommon.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\FodyHelpers\FodyHelpers.csproj" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
