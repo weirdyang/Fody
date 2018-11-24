@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 public partial class InnerWeaver
@@ -23,7 +22,6 @@ public partial class InnerWeaver
 
     public static Assembly LoadFromFile(string assemblyPath)
     {
-        var rawAssembly = File.ReadAllBytes(assemblyPath);
-        return Assembly.Load(rawAssembly);
+        return Assembly.LoadFrom(assemblyPath);
     }
 }

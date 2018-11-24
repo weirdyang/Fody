@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FodyHelpers" Version="$(IntegrationVersion)" />
